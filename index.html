@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QR Studio – Pro QR Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700&f[]=satoshi@400,500,700&display=swap" rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- QR library -->
+  <script src=""qr-code-styling.js" defer></script>
+  <script src="main.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div>
+        <h1>QR Studio</h1>
+        <p>Client‑ready QR codes with precise payload, branding, and depth.</p>
+      </div>
+      <div class="header-pill">No backend · Exports PNG</div>
+    </header>
+
+    <main class="app-grid">
+      <!-- LEFT COLUMN: TYPE + PAYLOAD -->
+      <section class="column">
+        <!-- Type -->
+        <section class="card">
+          <h2 class="card-title">1 · Payload type</h2>
+          <div class="segment" id="modeSelector">
+            <button class="active" type="button" data-mode="text">Text</button>
+            <button type="button" data-mode="link">Link</button>
+            <button type="button" data-mode="image">Image</button>
+            <button type="button" data-mode="wifi">Wi‑Fi</button>
+            <button type="button" data-mode="email">Email</button>
+            <button type="button" data-mode="sms">SMS</button>
+            <button type="button" data-mode="custom">Custom</button>
+          </div>
+        </section>
+
+        <!-- Payload -->
+        <section class="card">
+          <h2 class="card-title">2 · Enter payload</h2>
+
+          <!-- Text -->
+          <div id="pane-text" class="payload-pane active">
+            <label class="field">
+              <span class="field-label">Text</span>
+              <textarea id="textPayload" class="input textarea"
+                placeholder="Any content: notes, instructions, descriptions, serials..."></textarea>
+              <span class="field-hint">Stored as plain text inside the QR.</span>
+            </label>
+          </div>
+
+          <!-- Link -->
+          <div id="pane-link" class="payload-pane">
+            <label class="field">
+              <span class="field-label">URL</span>
+              <input id="linkInput" class="input" type="url" placeholder="https://example.com" />
+              <span class="field-hint">Full URL opened when the QR is scanned.</span>
+            </label>
+          </div>
+
+          <!-- Image -->
+          <div id="pane-image" class="payload-pane">
+            <label class="field">
+              <span class="field-label">Image file</span>
+              <input id="imageFile" class="input" type="file" accept="image/*" />
+              <span class="field-hint">Image is converted to a data URL and encoded.</span>
+            </label>
+            <label class="field">
+              <span class="field-label">Or image URL</span>
+              <input id="imageUrl" class="input" type="url" placeholder="https://example.com/image.jpg" />
+            </label>
+          </div>
+
+          <!-- Wi‑Fi -->
+          <div id="pane-wifi" class="payload-pane">
+            <label class="field">
+              <span class="field-label">Wi‑Fi config</span>
+              <input id="wifiPayload" class="input" type="text"
+                     placeholder="WIFI:T:WPA;S:SmartHire;P:smarthire@2026;H:false;;" />
+              <span class="field-hint">Standard Wi‑Fi QR format (T, S, P, H).</span>
+            </label>
+          </div>
+
+          <!-- Email -->
+          <div id="pane-email" class="payload-pane">
+            <label class="field">
+              <span class="field-label">To</span>
+              <input id="emailTo" class="input" type="email" placeholder="user@example.com" />
+            </label>
+            <label class="field">
+              <span class="field-label">Subject</span>
+              <input id="emailSubject" class="input" type="text" placeholder="Subject" />
+            </label>
+            <label class="field">
+              <span class="field-label">Body</span>
+              <textarea id="emailBody" class="input textarea" placeholder="Message..."></textarea>
+              <span class="field-hint">Composes a mailto: link.</span>
+            </label>
+          </div>
+
+          <!-- SMS -->
+          <div id="pane-sms" class="payload-pane">
+            <label class="field">
+              <span class="field-label">Phone</span>
+              <input id="smsNumber" class="input" type="tel" placeholder="+91..." />
+            </label>
+            <label class="field">
+              <span class="field-label">Message</span>
+              <textarea id="smsMessage" class="input textarea" placeholder="Message..."></textarea>
+              <span class="field-hint">Composes an SMSTO: link.</span>
+            </label>
+          </div>
+
+          <!-- Custom -->
+          <div id="pane-custom" class="payload-pane">
+            <label class="field">
+              <span class="field-label">Custom URI</span>
+              <input id="customPayload" class="input" type="text"
+                     placeholder="otpauth://totp/... , geo:..., tel:..., etc." />
+              <span class="field-hint">Any custom QR URI scheme.</span>
+            </label>
+          </div>
+
+          <div class="actions">
+            <button id="generateBtn" class="btn primary" type="button">Generate QR</button>
+            <button id="regenBtn" class="btn ghost" type="button">Generate another</button>
+            <button id="clearBtn" class="btn ghost" type="button">Reset</button>
+          </div>
+        </section>
+      </section>
+
+      <!-- RIGHT COLUMN: PREVIEW + STYLING -->
+      <section class="column">
+        <section class="card card-preview">
+          <div class="title-row">
+            <h2 class="card-title">3 · Preview & style</h2>
+            <span id="modeBadge" class="pill">Text mode</span>
+          </div>
+
+          <div class="preview-shell">
+            <div class="preview-glass"></div>
+
+            <!-- background shape selector -->
+            <div class="bg-shape-selector">
+              <button type="button" data-shape="none" class="bg-shape-btn active">Plain</button>
+              <button type="button" data-shape="circle" class="bg-shape-btn">Circle</button>
+              <button type="button" data-shape="heart" class="bg-shape-btn">Heart</button>
+            </div>
+
+            <div class="qr-shell" id="qrShell">
+              <div class="qr-inner">
+                <div id="qrcode"></div>
+              </div>
+            </div>
+          </div>
+          <p id="downloadHint" class="hint-bottom">
+            Enter payload and click “Generate QR” to render it here.
+          </p>
+
+          <div id="customizationArea" class="customization hidden">
+            <h3 class="sub-heading">Style & logo</h3>
+            <div class="grid">
+              <label class="field">
+                <span class="field-label">Dot shape</span>
+                <select id="dotShape" class="input">
+                  <option value="square">Square</option>
+                  <option value="dots" selected>Dots</option>
+                  <option value="rounded">Rounded</option>
+                  <option value="extra-rounded">Extra rounded</option>
+                </select>
+              </label>
+
+              <label class="field">
+                <span class="field-label">Corner shape</span>
+                <select id="cornerShape" class="input">
+                  <option value="square">Square</option>
+                  <option value="dot" selected>Dots</option>
+                  <option value="extra-rounded">Extra rounded</option>
+                </select>
+              </label>
+
+              <label class="field">
+                <span class="field-label">Dot color</span>
+                <input id="dotColor" class="input" type="color" value="#111827" />
+              </label>
+
+              <label class="field">
+                <span class="field-label">Background</span>
+                <input id="bgColor" class="input" type="color" value="#f9fafb" />
+              </label>
+
+              <label class="field">
+                <span class="field-label">Size</span>
+                <input id="qrSize" class="input range" type="range" min="220" max="420" step="10" value="300" />
+                <span class="field-hint"><span id="qrSizeValue">300</span> px</span>
+              </label>
+
+              <label class="field">
+                <span class="field-label">Tilt X</span>
+                <input id="tiltX" class="input range" type="range" min="-16" max="16" step="1" value="0" />
+                <span class="field-hint"><span id="tiltXValue">0</span>°</span>
+              </label>
+
+              <label class="field">
+                <span class="field-label">Tilt Y</span>
+                <input id="tiltY" class="input range" type="range" min="-16" max="16" step="1" value="0" />
+                <span class="field-hint"><span id="tiltYValue">0</span>°</span>
+              </label>
+
+              <label class="field">
+                <span class="field-label">Shadow</span>
+                <input id="shadowDepth" class="input range" type="range" min="10" max="40" step="2" value="22" />
+                <span class="field-hint"><span id="shadowDepthValue">22</span> px</span>
+              </label>
+
+              <!-- Logo controls -->
+              <label class="field wide">
+                <span class="field-label">Center logo</span>
+                <input id="logoUpload" class="input" type="file" accept="image/*" />
+                <span class="field-hint">Upload PNG/JPG/SVG logo.</span>
+              </label>
+
+              <label class="field">
+                <span class="field-label">Logo size</span>
+                <input id="logoSize" class="input range" type="range" min="10" max="45" step="2" value="22" />
+                <span class="field-hint"><span id="logoSizeValue">22</span>% of QR (keep ≤ 40% for scan safety).</span>
+              </label>
+
+              <label class="field">
+                <span class="field-label">Logo corners</span>
+                <input id="logoRadius" class="input range" type="range" min="0" max="24" step="2" value="8" />
+                <span class="field-hint"><span id="logoRadiusValue">8</span> px</span>
+              </label>
+
+              <label class="field">
+                <span class="field-label">Logo margin</span>
+                <input id="logoMargin" class="input range" type="range" min="0" max="20" step="2" value="6" />
+                <span class="field-hint"><span id="logoMarginValue">6</span> px space around logo.</span>
+              </label>
+
+              <label class="field">
+                <span class="field-label">Logo opacity</span>
+                <input id="logoOpacity" class="input range" type="range" min="40" max="100" step="5" value="100" />
+                <span class="field-hint"><span id="logoOpacityValue">100</span>% opacity.</span>
+              </label>
+
+              <label class="field">
+                <span class="field-label">Hide dots under logo</span>
+                <select id="hideDots" class="input">
+                  <option value="true" selected>Yes (recommended)</option>
+                  <option value="false">No</option>
+                </select>
+              </label>
+
+              <div class="field">
+                <span class="field-label">Logo actions</span>
+                <button id="clearLogoBtn" class="btn ghost small" type="button">Remove logo</button>
+              </div>
+            </div>
+
+            <div class="meta-row">
+              <span id="charCount" class="meta-pill">0 chars</span>
+              <span id="renderSize" class="meta-pill">—</span>
+              <span id="logoState" class="meta-pill">No logo</span>
+            </div>
+
+            <div class="actions">
+              <button id="downloadBtn" class="btn primary" type="button">Download PNG</button>
+              <button id="copyPayloadBtn" class="btn ghost" type="button">Copy payload</button>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
